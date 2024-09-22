@@ -12,16 +12,6 @@ lib.registerContext({
     title = 'Pause Menu',
     options = {
         {
-            title = 'Settings',
-            description = 'Open settings menu',
-            icon = 'cogs',
-            iconColor = 'dodgerblue',
-            onSelect = function()
-                SetNuiFocus(false, false)
-                ActivateFrontendMenu(GetHashKey("FE_MENU_VERSION_LANDING_MENU"), false, -1)
-            end
-        },
-        {
             title = 'Map',
             description = 'Open the map',
             icon = 'map-marked-alt',
@@ -31,6 +21,16 @@ lib.registerContext({
                 ActivateFrontendMenu(GetHashKey('FE_MENU_VERSION_MP_PAUSE'), 0, -1)
                 Wait(60)
                 SetFrontendActive(true)
+            end
+        },
+        {
+            title = 'Settings',
+            description = 'Open settings menu',
+            icon = 'cogs',
+            iconColor = 'dodgerblue',
+            onSelect = function()
+                SetNuiFocus(false, false)
+                ActivateFrontendMenu(GetHashKey("FE_MENU_VERSION_LANDING_MENU"), false, -1)
             end
         },
         {
