@@ -45,6 +45,8 @@ lib.registerContext({
         }
     },
     onExit = function()
+        -- Remove blur effect when the menu is closed
+        ClearTimecycleModifier()
     end
 })
 
@@ -52,8 +54,15 @@ RegisterCommand('togglePauseMenu', function()
     local openMenu = lib.getOpenContextMenu()
     if openMenu == 'pause_menu' then
         lib.hideContext(true)
+        -- Remove blur effect when the menu is closed
+        ClearTimecycleModifier()
     else
         lib.showContext('pause_menu')
+        -- Play frontend sound when the menu is opened
+        PlaySoundFrontend(-1, "SELECT", "HUD_FRONTEND_DEFAULT_SOUNDSET", true)
+        -- Apply blur effect when the menu is opened
+        SetTimecycleModifier("hud_def_blur")
+        SetTimecycleModifierStrength(1.0)
     end
 end)
 
