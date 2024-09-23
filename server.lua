@@ -23,10 +23,10 @@ RegisterNetEvent('ox-pause:server:sendReport', function(reason, discord)
     }
 
     PerformHttpRequest(webhookURL, function(err, text, headers)
-        if err ~= 200 then
-            print(string.format("Failed to send report: %s", err))
-        else
+        if err == 200 or err == 204 then
             print("Report sent successfully.")
+        else
+            print(string.format("Failed to send report: %s, Response: %s", err, text))
         end
     end, 'POST', json.encode({username = "Report Bot", embeds = reportMessage}), { ['Content-Type'] = 'application/json' })
 end)

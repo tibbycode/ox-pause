@@ -30,11 +30,14 @@ end
 -- Function to handle player animation
 local function playAnimation()
     local playerPed = PlayerPedId()
-    RequestAnimDict("amb@world_human_hang_out_street@female_hold_arm@idle_a")
-    while not HasAnimDictLoaded("amb@world_human_hang_out_street@female_hold_arm@idle_a") do
+    local animDict = "amb@world_human_hang_out_street@male_c@idle_a"
+    local animName = "idle_a"
+
+    RequestAnimDict(animDict)
+    while not HasAnimDictLoaded(animDict) do
         Wait(100)
     end
-    TaskPlayAnim(playerPed, "amb@world_human_hang_out_street@female_hold_arm@idle_a", "idle_a", 8.0, -8.0, -1, 1, 0, false, false, false)
+    TaskPlayAnim(playerPed, animDict, animName, 8.0, -8.0, -1, 1, 0, false, false, false)
 end
 
 -- Function to handle player freezing
@@ -106,6 +109,12 @@ lib.registerContext({
                 if input then
                     -- Send report to server
                     TriggerServerEvent('ox-pause:server:sendReport', input[1], input[2])
+                    -- Notify the player that the report was sent
+                    lib.notify({
+                        title = 'Report Sent',
+                        description = 'Your report has been submitted successfully.',
+                        type = 'success'
+                    })
                 end
 
                 -- Clear the timecycle modifier after the input dialog is closed
@@ -152,8 +161,8 @@ RegisterCommand('togglePauseMenu', function()
         -- Play frontend sound when the menu is opened
         PlaySoundFrontend(-1, "SELECT", "HUD_FRONTEND_DEFAULT_SOUNDSET", true)
         -- Apply blur effect when the menu is opened
-        SetTimecycleModifier("bloom")
-        SetTimecycleModifierStrength(1.0)
+        SetTimecycleModifier("hud_def_blur")
+        SetTimecycleModifierStrength(1.5)
         -- Create and set up the camera if enabled
         if config.enableCamera then
             setupCamera()
