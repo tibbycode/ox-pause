@@ -34,6 +34,24 @@ lib.registerContext({
             end
         },
         {
+            title = 'Report',
+            description = 'Report an issue or player',
+            icon = 'exclamation-triangle',
+            iconColor = 'orange',
+            onSelect = function()
+                -- Open report input dialog
+                local input = lib.inputDialog('Report Issue/Player', {
+                    {type = 'input', label = 'Reason for Report', description = 'Describe the issue or player behavior', required = true},
+                    {type = 'input', label = 'Your Discord', description = 'Enter your Discord ID for contact', required = true}
+                })
+
+                if input then
+                    -- Send report to server
+                    TriggerServerEvent('qb-core:server:sendReport', input[1], input[2])
+                end
+            end
+        },
+        {
             title = 'Quit Game',
             description = 'Quit the game',
             icon = 'power-off',
