@@ -35,9 +35,3 @@ The script includes a configuration option to enable or disable the camera featu
 local config = {
     enableCamera = false, -- Set this to true to enable the camera feature
 }
-
-Menu Options
-Map: Opens the in-game map.
-Settings: Opens the settings menu.
-Report: Opens a dialog to report an issue or player. The report is sent to a specified Discord webhook.
-Quit Game: Disconnects the player from the server.
