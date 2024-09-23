@@ -1,4 +1,4 @@
----@diagnostic disable: unused-local
+---@diagnostic disable: unused-local, missing-parameter
 
 local config = {
     enableCamera = false, -- Set this to false to disable the camera feature
@@ -32,7 +32,7 @@ local function playAnimation()
     local playerPed = PlayerPedId()
     RequestAnimDict("amb@world_human_hang_out_street@female_hold_arm@idle_a")
     while not HasAnimDictLoaded("amb@world_human_hang_out_street@female_hold_arm@idle_a") do
-        Citizen.Wait(100)
+        Wait(100)
     end
     TaskPlayAnim(playerPed, "amb@world_human_hang_out_street@female_hold_arm@idle_a", "idle_a", 8.0, -8.0, -1, 1, 0, false, false, false)
 end
@@ -51,7 +51,7 @@ end
 -- Disable control action in a separate thread
 Citizen.CreateThread(function()
     while true do
-        Citizen.Wait(0)
+        Wait(0)
         DisableControlAction(0, 200, true)
     end
 end)
@@ -72,7 +72,7 @@ lib.registerContext({
                     Wait(100)
                     PauseMenuceptionGoDeeper(0)
                     while true do
-                        Citizen.Wait(10)
+                        Wait(10)
                         if IsControlJustPressed(0, 200) then
                             SetFrontendActive(0)
                             break
@@ -105,7 +105,7 @@ lib.registerContext({
 
                 if input then
                     -- Send report to server
-                    TriggerServerEvent('qb-core:server:sendReport', input[1], input[2])
+                    TriggerServerEvent('ox-pause:server:sendReport', input[1], input[2])
                 end
 
                 -- Clear the timecycle modifier after the input dialog is closed
@@ -123,7 +123,7 @@ lib.registerContext({
             iconColor = 'red',
             onSelect = function()
                 SetNuiFocus(false, false)
-                TriggerServerEvent('qb-core:server:disconnectPlayer')
+                TriggerServerEvent('ox-pause:server:disconnectPlayer')
             end
         }
     },

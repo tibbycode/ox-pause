@@ -8,7 +8,7 @@ if webhookURL == '' then
     return
 end
 
-RegisterNetEvent('qb-core:server:sendReport', function(reason, discord)
+RegisterNetEvent('ox-pause:server:sendReport', function(reason, discord)
     local src = source
     local playerName = GetPlayerName(src)
     local reportMessage = {
@@ -31,7 +31,7 @@ RegisterNetEvent('qb-core:server:sendReport', function(reason, discord)
     end, 'POST', json.encode({username = "Report Bot", embeds = reportMessage}), { ['Content-Type'] = 'application/json' })
 end)
 
-RegisterNetEvent('qb-core:server:disconnectPlayer', function()
+RegisterNetEvent('ox-pause:server:disconnectPlayer', function()
     local src = source
     DropPlayer(src, "You have been disconnected from the server.")
 end)
