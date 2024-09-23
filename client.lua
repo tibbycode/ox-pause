@@ -1,5 +1,54 @@
 ---@diagnostic disable: unused-local
 
+local config = {
+    enableCamera = false, -- Set this to false to disable the camera feature
+}
+
+local camera = nil
+
+-- Function to handle camera creation and setup
+local function setupCamera()
+    local playerPed = PlayerPedId()
+    local playerCoords = GetEntityCoords(playerPed)
+    local camCoords = GetOffsetFromEntityInWorldCoords(playerPed, 0.0, 1.0, 0.8) -- Adjusted for close-up view in front of the player
+    camera = CreateCam("DEFAULT_SCRIPTED_CAMERA", true)
+    SetCamCoord(camera, camCoords.x, camCoords.y, camCoords.z)
+    PointCamAtCoord(camera, playerCoords.x, playerCoords.y, playerCoords.z + 0.6) -- Adjusted to point at the face without moving the player
+    SetCamActive(camera, true)
+    RenderScriptCams(true, false, 0, true, true)
+end
+
+-- Function to handle camera destruction
+local function destroyCamera()
+    if config.enableCamera and camera then
+        DestroyCam(camera, false)
+        RenderScriptCams(false, false, 0, true, true)
+        camera = nil
+    end
+end
+
+-- Function to handle player animation
+local function playAnimation()
+    local playerPed = PlayerPedId()
+    RequestAnimDict("amb@world_human_hang_out_street@female_hold_arm@idle_a")
+    while not HasAnimDictLoaded("amb@world_human_hang_out_street@female_hold_arm@idle_a") do
+        Citizen.Wait(100)
+    end
+    TaskPlayAnim(playerPed, "amb@world_human_hang_out_street@female_hold_arm@idle_a", "idle_a", 8.0, -8.0, -1, 1, 0, false, false, false)
+end
+
+-- Function to handle player freezing
+local function freezePlayer(freeze)
+    local playerPed = PlayerPedId()
+    FreezeEntityPosition(playerPed, freeze)
+    if freeze then
+        TaskStandStill(playerPed, -1)
+    else
+        ClearPedTasksImmediately(playerPed)
+    end
+end
+
+-- Disable control action in a separate thread
 Citizen.CreateThread(function()
     while true do
         Citizen.Wait(0)
@@ -18,9 +67,18 @@ lib.registerContext({
             iconColor = 'limegreen',
             onSelect = function()
                 SetNuiFocus(false, false)
-                ActivateFrontendMenu(GetHashKey('FE_MENU_VERSION_MP_PAUSE'), 0, -1)
-                Wait(60)
-                SetFrontendActive(true)
+                Citizen.CreateThread(function()
+                    ActivateFrontendMenu(GetHashKey('FE_MENU_VERSION_MP_PAUSE'), 0, -1)
+                    Wait(100)
+                    PauseMenuceptionGoDeeper(0)
+                    while true do
+                        Citizen.Wait(10)
+                        if IsControlJustPressed(0, 200) then
+                            SetFrontendActive(0)
+                            break
+                        end
+                    end
+                end)
             end
         },
         {
@@ -49,6 +107,13 @@ lib.registerContext({
                     -- Send report to server
                     TriggerServerEvent('qb-core:server:sendReport', input[1], input[2])
                 end
+
+                -- Clear the timecycle modifier after the input dialog is closed
+                ClearTimecycleModifier()
+                -- Destroy the camera if it exists
+                destroyCamera()
+                -- Unfreeze the player and clear animation
+                freezePlayer(false)
             end
         },
         {
@@ -65,6 +130,10 @@ lib.registerContext({
     onExit = function()
         -- Remove blur effect when the menu is closed
         ClearTimecycleModifier()
+        -- Destroy the camera if it exists
+        destroyCamera()
+        -- Unfreeze the player and clear animation
+        freezePlayer(false)
     end
 })
 
@@ -74,13 +143,24 @@ RegisterCommand('togglePauseMenu', function()
         lib.hideContext(true)
         -- Remove blur effect when the menu is closed
         ClearTimecycleModifier()
+        -- Destroy the camera if it exists
+        destroyCamera()
+        -- Unfreeze the player and clear animation
+        freezePlayer(false)
     else
         lib.showContext('pause_menu')
         -- Play frontend sound when the menu is opened
         PlaySoundFrontend(-1, "SELECT", "HUD_FRONTEND_DEFAULT_SOUNDSET", true)
         -- Apply blur effect when the menu is opened
-        SetTimecycleModifier("hud_def_blur")
+        SetTimecycleModifier("bloom")
         SetTimecycleModifierStrength(1.0)
+        -- Create and set up the camera if enabled
+        if config.enableCamera then
+            setupCamera()
+            -- Freeze the player and play animation
+            freezePlayer(true)
+            playAnimation()
+        end
     end
 end)
 

@@ -1,5 +1,12 @@
 ---@diagnostic disable: unused-local
-local webhookURL = 'https://discord.com/api/webhooks/1287590750019653722/qO19JfEB2s9ppbPNMcdRKuIzAldgSOI4vocnBCNwRF-IixL0wNHmhHNQoeMd2AcEZJvB'
+
+-- Load the webhook URL from an environment variable for security
+local webhookURL = GetConvar('report_webhook_url', '')
+
+if webhookURL == '' then
+    print("Error: Webhook URL is not set. Please set the 'report_webhook_url' in server cfg.")
+    return
+end
 
 RegisterNetEvent('qb-core:server:sendReport', function(reason, discord)
     local src = source
@@ -15,7 +22,13 @@ RegisterNetEvent('qb-core:server:sendReport', function(reason, discord)
         }
     }
 
-    PerformHttpRequest(webhookURL, function(err, text, headers) end, 'POST', json.encode({username = "Report Bot", embeds = reportMessage}), { ['Content-Type'] = 'application/json' })
+    PerformHttpRequest(webhookURL, function(err, text, headers)
+        if err ~= 200 then
+            print(string.format("Failed to send report: %s", err))
+        else
+            print("Report sent successfully.")
+        end
+    end, 'POST', json.encode({username = "Report Bot", embeds = reportMessage}), { ['Content-Type'] = 'application/json' })
 end)
 
 RegisterNetEvent('qb-core:server:disconnectPlayer', function()
